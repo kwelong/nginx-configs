@@ -1,0 +1,6 @@
+Please create a new site-specific configuration file
+To enable a site, please create a soft link in ../sites-enabled
+For example:
+# cd ../sites-enabled
+# ln -s ../sites-available/99-example.com.conf
+

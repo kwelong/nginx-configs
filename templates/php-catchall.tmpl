@@ -1,0 +1,9 @@
+# Normal PHP scripts
+location / {
+    #try_files $uri =404;
+    try_files $uri $uri/ /index.php;
+    location ~ \.php$ {
+        include /etc/nginx/templates/fastcgi_php.tmpl;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}

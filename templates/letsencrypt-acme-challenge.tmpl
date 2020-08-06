@@ -1,0 +1,8 @@
+# Allow ACME challenge by Let's Encrypt 
+location ^~ /.well-known/acme-challenge/ {
+    access_log off;
+    log_not_found off;
+    default_type "text/plain";
+    autoindex off;
+    try_files $uri =404;
+}

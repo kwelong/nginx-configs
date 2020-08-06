@@ -1,0 +1,14 @@
+server {
+	listen		80;
+	listen		[::]:80;
+	server_name	example.com;
+	root		/var/www/example.com/htdocs;
+	index		index.php index.html index.htm;
+
+	access_log  /var/log/nginx/example.com.access_log;
+	error_log   /var/log/nginx/example.com.error_log  warn;
+
+	include /etc/nginx/templates/letsencrypt-acme-challenge.tmpl;
+	include /etc/nginx/templates/misc.tmpl;
+}
+

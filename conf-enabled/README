@@ -1,0 +1,4 @@
+Please create a soft link to the configuration files in ../conf-available
+For example, to enable 0-general.conf:
+# ln -s ../conf-available/0-general.conf
+

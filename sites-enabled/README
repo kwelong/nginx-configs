@@ -1,0 +1,4 @@
+Please create a soft link to the site-specific configuration files in ../sites-available
+For example:
+# ln -s ../sites-available/99-example.com.conf
+

@@ -1,0 +1,71 @@
+# ----------------------------------------------------------------------
+# | SSL engine                                                         |
+# ----------------------------------------------------------------------
+
+# (1) Optimize SSL by caching session parameters for 24 hours.
+#     This cuts down on the number of expensive SSL handshakes.
+#     By enabling a cache, we tell the client to re-use the already
+#     negotiated state.
+#     Here 10m (10 MB) in ssl_session_cache is size value (not time).
+#     1 MB cache can store about 4000 sessions, so we can store 40000 sessions.
+#
+# (2) Use a higher keepalive timeout to reduce the need for repeated handshakes
+#     (!) Shouldn't be done unless you serve primarily HTTPS.
+#     Default: keepalive_timeout 75s;
+#
+# (3) SSL buffer size
+#     Set 1400 bytes to fit in one MTU.
+#     https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_buffer_size
+#     ssl_buffer_size 1400;
+#
+# (4) Disable session tickets
+#     Session tickets keys are not auto-rotated. Only a HUP / restart will do
+#     so and when a restart is performed the previous key is lost, which resets
+#     all previous sessions.
+#     Only enable session tickets if you set up a manual rotation mechanism.
+#     https://trac.nginx.org/nginx/changeset/1356a3b9692441e163b4e78be4e9f5a46c7479e9/nginx
+#     https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_session_tickets
+#
+
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_session_cache shared:SSL:10m;
+ssl_session_timeout  24h;
+ssl_prefer_server_ciphers on;
+ssl_session_tickets off;
+ssl_ecdh_curve secp384r1;
+ssl_dhparam /etc/pki/tls/dhparam.pem;
+server_tokens off;
+
+# Disable gzip for SSL requests
+gzip off;
+
+# =====================================================================
+# Cipher Suites
+# Different ciphers come with different security strength.
+# However, some old browsers or devices do not support some new ciphers
+# Choose wisely
+# =====================================================================
+
+# Mozilla Ciphersuits Recommendation
+# Reference: https://ssl-config.mozilla.org/
+#ssl_ciphers HIGH:!aNULL:!MD5;
+
+# Generated 2020-07-29, Mozilla Guideline v5.6, nginx 1.14.1, OpenSSL 1.1.1c, intermediate configuration
+# https://ssl-config.mozilla.org/#server=nginx&version=1.14.1&config=intermediate&openssl=1.1.1c&guideline=5.6
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+
+# iRedMail configuration
+# Fix 'The Logjam Attack'
+#ssl_ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5;
+
+# Recommendation from: https://sslciphers.com/
+#ssl_ciphers "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA HIGH !RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS";
+
+# Recommended from: https://www.cyberciti.biz/faq/issue-lets-encrypt-wildcard-certificate-with-acme-sh-and-cloudflare-dns/
+#ssl_ciphers 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384';
+
+# Recommended from: https://zurgl.com/how-to-get-a-100-score-on-ssl-labs-nginx-lets-encrypt/
+#ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384::ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384';
+
+#ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+
